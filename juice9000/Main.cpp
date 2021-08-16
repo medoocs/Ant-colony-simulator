@@ -4,13 +4,13 @@
 #include <math.h>
 #include <Windows.h>
 #include "mrav.h"
+#include "food.h"
 
-void draw(std::vector<Mrav>& mravi, sf::RenderWindow& window) {
-    for (auto m : mravi) {
-        window.draw(m.sMrav);
+template<typename T>
+void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
+    for (auto s : shapes) {
+        window.draw(s.getSprite());
     }
-
-    std::cout << "333" << std::endl;
 }
 
 
@@ -21,6 +21,7 @@ int main()
     window.setFramerateLimit(144);
     
     std::vector<Mrav> mravi;
+    std::vector<Food> hrana;
     int n = 5;
 
     //mravinjak
@@ -35,8 +36,7 @@ int main()
     sMravinjak.setPosition(1280 / 2 - tMravinjak.getSize().x / 2 * 1.5f, 720 / 2 - tMravinjak.getSize().y / 2 * 1.5f);
 
     for (int i = 0; i < n; ++i) {
-        Mrav newMrav;
-        mravi.push_back(newMrav);
+        mravi.emplace_back();
     }
         
 
@@ -45,18 +45,36 @@ int main()
         sf::Time dt = deltaClock.restart();
         sf::Event event;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed)
+            switch (event.type) {
+            case sf::Event::Closed:
                 window.close();
+                break;
+            case sf::Event::KeyPressed:
+                if (event.key.code == sf::Keyboard::Escape) window.close();
+                break;
+            case sf::Event::MouseButtonPressed:
+                if (event.mouseButton.button == sf::Mouse::Right){
+                    sf::Vector2f mousePosition((float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y);
+                    //std::cout << mousePosition.x << "  " << mousePosition.y << std::endl;
+                    hrana.emplace_back(mousePosition);
+                }
+                break;
+            }
         }
 
         //clear
         window.clear(sf::Color(49, 99, 0));
-        window.draw(sMravinjak);
+        
         //moving
-        for(auto m: mravi)
-            m.move(dt, window);
+        for (int i = 0; i < n; ++i) {
+            mravi[i].move(dt, window);
+        }
+
+        draw(hrana, window);
         draw(mravi, window);
+        
         //display
+        window.draw(sMravinjak);
         window.display();
     }
 
