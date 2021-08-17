@@ -19,7 +19,7 @@ void Food::eat() {
     std::cout << amount <<" JEDEM\n";
 }
 
-bool Food::isGone() {
+bool Food::isGone() const{
     if (amount <= 0)
         return true;
     else return false;

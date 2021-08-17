@@ -28,7 +28,7 @@ int main()
     std::vector<Mrav> mravi;
     std::vector<Food> hrana;
 
-    int n = 100;
+    int n = 512;
 
     //mravinjak
     sf::Sprite sMravinjak;
@@ -71,6 +71,9 @@ int main()
         for (int i = 0; i < n; ++i) {
             mravi[i].move(dt, window, hrana);
         }
+
+        auto it = std::remove_if(hrana.begin(), hrana.end(), [](const auto& x) {return x.isGone(); });
+        if (it != hrana.end()) hrana.erase(it);
 
         draw(hrana, window);
         draw(mravi, window);

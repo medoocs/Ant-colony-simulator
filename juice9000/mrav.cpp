@@ -1,6 +1,7 @@
 #include "mrav.h"
 #include "utils.h"
 #include <iostream>
+#include <vector>
 #include "config.hpp"
 
 Mrav::Mrav() {
@@ -61,9 +62,6 @@ void Mrav::checkFood(std::vector<Food>& hrana) {
             if (!hasFood) {
                 h.eat();
                 hasFood = true;
-                if (h.isGone()) {
-                    std::cout << "Smo pojili sve\n";
-                }
             }
         }
     }

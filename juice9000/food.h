@@ -10,6 +10,6 @@ class Food {
 		Food(sf::Vector2f pos);
 		~Food() = default;
 		void eat();
-		bool isGone();
+		bool isGone() const;
 		sf::Sprite getSprite();
 };
