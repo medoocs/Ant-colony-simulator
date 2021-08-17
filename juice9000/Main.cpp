@@ -28,7 +28,7 @@ int main()
     std::vector<Mrav> mravi;
     std::vector<Food> hrana;
 
-    int n = 5;
+    int n = 100;
 
     //mravinjak
     sf::Sprite sMravinjak;

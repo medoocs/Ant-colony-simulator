@@ -11,7 +11,7 @@ Mrav::Mrav() {
     sMrav.setPosition(1280 / 2 - (*Config::tAnt).getSize().x / 2 * 0.2f, 720 / 2 - (*Config::tAnt).getSize().y / 2 * 0.2f);
 }
 
-void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food> hrana) {
+void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana) {
     float maxSpeed = 500;
     float steerStrength = 200;
     float wanderStrength = 1;
@@ -55,12 +55,11 @@ sf::Sprite Mrav::getSprite() {
     return sMrav;
 }
 
-void Mrav::checkFood(std::vector<Food> hrana) {
-    for (auto h : hrana) {
+void Mrav::checkFood(std::vector<Food>& hrana) {
+    for (auto &h : hrana) {
         if (sMrav.getGlobalBounds().intersects(h.getSprite().getGlobalBounds())){
             if (!hasFood) {
                 h.eat();
-                std::cout << h.amount << "\n";
                 hasFood = true;
                 if (h.isGone()) {
                     std::cout << "Smo pojili sve\n";

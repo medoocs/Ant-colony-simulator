@@ -13,7 +13,7 @@ class Mrav{
         sf::Sprite sMrav;
         Mrav();
         ~Mrav() = default;
-        void move(sf::Time dt, sf::RenderWindow& window, std::vector<Food> hrana);
+        void move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana);
         sf::Sprite getSprite();
-        void checkFood(std::vector<Food> hrana);
+        void checkFood(std::vector<Food>& hrana);
 };

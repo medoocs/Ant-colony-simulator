@@ -5,7 +5,7 @@ class Food {
 		sf::Vector2f position;
 		sf::Texture tFood;
 		sf::Sprite sFood;
-		float amount;
+		int32_t amount;
 
 		Food(sf::Vector2f pos);
 		~Food() = default;
