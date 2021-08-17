@@ -156,12 +156,14 @@
     <Image Include="res\marker.png" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="config.cpp" />
     <ClCompile Include="food.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="mrav.cpp" />
     <ClCompile Include="utils.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="config.hpp" />
     <ClInclude Include="food.h" />
     <ClInclude Include="mrav.h" />
     <ClInclude Include="utils.h" />

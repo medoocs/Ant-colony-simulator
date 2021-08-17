@@ -5,6 +5,7 @@
 #include <Windows.h>
 #include "mrav.h"
 #include "food.h"
+#include "config.hpp"
 
 template<typename T>
 void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
@@ -17,23 +18,24 @@ void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
 int main()
 {
     //init
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "Mravi9000");
+    //sf::ContextSettings settings;
+    //settings.antialiasingLevel = 8;
+    sf::RenderWindow window(sf::VideoMode(Config::width, Config::height), "Mravi9000"/*, sf::Style::Default, settings*/);
     window.setFramerateLimit(144);
     
+    Config::loadTextures();
+
     std::vector<Mrav> mravi;
     std::vector<Food> hrana;
+
     int n = 5;
 
     //mravinjak
-    sf::Texture tMravinjak;
-    if (!tMravinjak.loadFromFile("res/marker.png"))
-        return -1;
-    tMravinjak.setSmooth(true);
     sf::Sprite sMravinjak;
-    sMravinjak.setTexture(tMravinjak);
+    sMravinjak.setTexture(*Config::tMarker);
     sMravinjak.setScale(1.5f, 1.5f);
-    sMravinjak.setColor(sf::Color(165, 42, 42));
-    sMravinjak.setPosition(1280 / 2 - tMravinjak.getSize().x / 2 * 1.5f, 720 / 2 - tMravinjak.getSize().y / 2 * 1.5f);
+    sMravinjak.setColor(Config::cMravinjak);
+    sMravinjak.setPosition(1280 / 2 - (*Config::tMarker).getSize().x / 2 * 1.5f, 720 / 2 - (*Config::tMarker).getSize().y / 2 * 1.5f);
 
     for (int i = 0; i < n; ++i) {
         mravi.emplace_back();
@@ -67,7 +69,7 @@ int main()
         
         //moving
         for (int i = 0; i < n; ++i) {
-            mravi[i].move(dt, window);
+            mravi[i].move(dt, window, hrana);
         }
 
         draw(hrana, window);

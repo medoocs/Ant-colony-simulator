@@ -1,19 +1,18 @@
 #include "food.h"
 #include <iostream>
+#include "config.hpp"
 
 Food::Food(sf::Vector2f pos) {
 	position = pos;
     std::cout << position.x << "  " << position.y << std::endl;
     amount = 10.f;
-    if (!tFood.loadFromFile("res/circle.png"))
-        std::cout << "Error nema slike" << std::endl;
 
-    tFood.setSmooth(true);
-    sFood.setTexture(tFood);
-    sFood.setOrigin(pos);
-    sFood.setScale(0.025f, 0.025f);
-    sFood.setColor(sf::Color(0, 255, 0));
-    sFood.setPosition(pos);
+    sFood.setTexture((*Config::tFood));
+    sFood.setOrigin(position);
+    sFood.setScale(0.05f, 0.05f);
+    sFood.setColor(Config::cFood);
+    sFood.setPosition(position.x, position.y);
+    std::cout << sFood.getPosition().x << " pozicija nakon " << sFood.getPosition().y << std::endl;
 }
 
 void Food::eat() {

@@ -1,20 +1,17 @@
 #include "mrav.h"
 #include "utils.h"
 #include <iostream>
+#include "config.hpp"
 
 Mrav::Mrav() {
-    if(!tMrav.loadFromFile("res/ant_2.png"))
-        std::cout << "Error nema slike" << std::endl;
-    
-    tMrav.setSmooth(true);
-    sMrav.setTexture(tMrav);
-    sMrav.setOrigin(tMrav.getSize().x / 2, tMrav.getSize().y / 2);
+    sMrav.setTexture(*Config::tAnt);
+    sMrav.setOrigin((*Config::tAnt).getSize().x / 2, (*Config::tAnt).getSize().y / 2);
     sMrav.setScale(0.2f, 0.2f);
-    sMrav.setColor(sf::Color(255, 0, 0));
-    sMrav.setPosition(1280 / 2 - tMrav.getSize().x / 2 * 0.2f, 720 / 2 - tMrav.getSize().y / 2 * 0.2f);
+    sMrav.setColor(Config::cAnt);
+    sMrav.setPosition(1280 / 2 - (*Config::tAnt).getSize().x / 2 * 0.2f, 720 / 2 - (*Config::tAnt).getSize().y / 2 * 0.2f);
 }
 
-void Mrav::move(sf::Time dt, sf::RenderWindow& window) {
+void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food> hrana) {
     float maxSpeed = 500;
     float steerStrength = 200;
     float wanderStrength = 1;
@@ -51,8 +48,25 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window) {
     
     sMrav.setPosition(position);
     sMrav.setRotation(angle + 90);
+    checkFood(hrana);
 }
 
 sf::Sprite Mrav::getSprite() {
     return sMrav;
+}
+
+void Mrav::checkFood(std::vector<Food> hrana) {
+    for (auto h : hrana) {
+        if (sMrav.getGlobalBounds().intersects(h.getSprite().getGlobalBounds())){
+            if (!hasFood) {
+                h.eat();
+                std::cout << h.amount << "\n";
+                hasFood = true;
+                if (h.isGone()) {
+                    std::cout << "Smo pojili sve\n";
+                }
+            }
+        }
+    }
+    
 }
