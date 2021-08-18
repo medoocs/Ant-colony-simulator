@@ -6,7 +6,6 @@ Food::Food(sf::Vector2f pos) {
 	position = pos;
     //std::cout << position.x << "  " << position.y << std::endl;
     amount = 10;
-    std::cout << "konsturktor\n";
     sFood.setTexture((*Config::tFood));
     sFood.setOrigin(position);
     sFood.setScale(0.05f, 0.05f);
@@ -17,6 +16,10 @@ Food::Food(sf::Vector2f pos) {
 void Food::eat() {
     amount--;
     std::cout << amount <<" JEDEM\n";
+}
+
+int32_t Food::getAmount() {
+    return amount;
 }
 
 bool Food::isGone() const{

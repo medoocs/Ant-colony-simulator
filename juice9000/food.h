@@ -11,5 +11,6 @@ class Food {
 		~Food() = default;
 		void eat();
 		bool isGone() const;
+		int32_t getAmount();
 		sf::Sprite getSprite();
 };

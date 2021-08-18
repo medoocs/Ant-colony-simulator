@@ -6,6 +6,7 @@
 #include "mrav.h"
 #include "food.h"
 #include "config.hpp"
+#include <ios>
 
 template<typename T>
 void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
@@ -17,6 +18,8 @@ void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
 
 int main()
 {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
     //init
     //sf::ContextSettings settings;
     //settings.antialiasingLevel = 8;
@@ -28,8 +31,8 @@ int main()
     std::vector<Mrav> mravi;
     std::vector<Food> hrana;
 
-    int n = 512;
-
+    int n = 84;
+    bool drawMarkers = true;
     //mravinjak
     sf::Sprite sMravinjak;
     sMravinjak.setTexture(*Config::tMarker);
@@ -38,7 +41,7 @@ int main()
     sMravinjak.setPosition(1280 / 2 - (*Config::tMarker).getSize().x / 2 * 1.5f, 720 / 2 - (*Config::tMarker).getSize().y / 2 * 1.5f);
 
     for (int i = 0; i < n; ++i) {
-        mravi.emplace_back();
+        mravi.emplace_back(i);
     }
         
 
@@ -69,7 +72,7 @@ int main()
         
         //moving
         for (int i = 0; i < n; ++i) {
-            mravi[i].move(dt, window, hrana);
+            mravi[i].move(dt, window, hrana, mravi, drawMarkers);
         }
 
         auto it = std::remove_if(hrana.begin(), hrana.end(), [](const auto& x) {return x.isGone(); });
