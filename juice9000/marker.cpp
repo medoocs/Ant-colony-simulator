@@ -4,31 +4,23 @@
 #include <iostream>
 
 Marker::Marker(sf::Vector2f position) {
-    isBlack = false;
-    sMarker.setTexture(*Config::tMarker);
-    sMarker.setOrigin((*Config::tMarker).getSize().x / 2, (*Config::tMarker).getSize().y / 2);
-    sMarker.setScale(0.05f, 0.05f);
-    sMarker.setColor(sf::Color::White);
+    sMarker.setRadius(0.25f);
+    sMarker.setOrigin(0.25f, 0.25f);
+    sMarker.setFillColor(sf::Color(255,255,255,0.1));
     sMarker.setPosition(position.x, position.y);
 }
 
 void Marker::changeColor() {
-    sMarker.setColor(sf::Color::Black);
+    sMarker.setFillColor(sf::Color::Black);
 }
 
 void Marker::changeToDefault() {
-    sMarker.setColor(sf::Color::White);
+    sMarker.setFillColor(sf::Color::White);
 }
 
-sf::Sprite Marker::getSprite() {
+sf::CircleShape Marker::getSprite() {
     return sMarker;
 }
 
-bool Marker::getBlack() {
-    return isBlack;
-}
 
-void Marker::setBlack(bool set) {
-    isBlack = set;
-    //std::cout << set << "\n";
-}
+

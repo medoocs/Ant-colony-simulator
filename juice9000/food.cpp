@@ -5,12 +5,12 @@
 Food::Food(sf::Vector2f pos) {
 	position = pos;
     //std::cout << position.x << "  " << position.y << std::endl;
-    amount = 10;
-    sFood.setTexture((*Config::tFood));
-    sFood.setOrigin(position);
-    sFood.setScale(0.05f, 0.05f);
-    sFood.setColor(Config::cFood);
-    sFood.setPosition(position.x, position.y);
+    amount = 100;
+    circle.setRadius(10.0f);
+    circle.setOrigin(10.0f, 10.0f);
+    circle.setFillColor(Config::cFood);
+    circle.setPosition(pos);
+
 }
 
 void Food::eat() {
@@ -28,6 +28,6 @@ bool Food::isGone() const{
     else return false;
 }
 
-sf::Sprite Food::getSprite() {
-    return sFood;
+sf::CircleShape Food::getSprite() {
+    return circle;
 }

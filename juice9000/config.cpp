@@ -3,8 +3,8 @@
 
 
 sf::Color Config::cAnt = sf::Color(255, 73, 68);
-sf::Color Config::cFood = sf::Color(29, 129, 18);
-sf::Color Config::cMravinjak = sf::Color(67, 46, 163);
+sf::Color Config::cFood = sf::Color::Magenta;
+sf::Color Config::cMravinjak = sf::Color(181, 101, 29);
 
 uint32_t Config::width = 1280;
 uint32_t Config::height = 720;

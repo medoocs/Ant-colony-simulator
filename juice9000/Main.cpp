@@ -6,18 +6,52 @@
 #include "mrav.h"
 #include "food.h"
 #include "config.hpp"
+#include <deque>
 #include <ios>
+#include <string> 
+#include <sstream>
+#include "world.h"
+
 
 template<typename T>
 void draw(std::vector<T>& shapes, sf::RenderWindow& window) {
-    for (auto s : shapes) {
+    for (auto &s : shapes) {
         window.draw(s.getSprite());
     }
+}
+
+void drawMarkersFunc(sf::RenderWindow& window) {
+    sf::Image tockice;
+    tockice.create(1280, 720, sf::Color::Transparent);
+    
+    for (int i = 0; i < 1280; ++i) {
+        for (int j = 0; j < 720; ++j) {
+            if (World::homeMatrix[i][j]) {
+                tockice.setPixel(i, j, sf::Color(255,255,255,120));
+                World::homeMatrix[i][j] -= 0.00075f;
+                if (World::homeMatrix[i][j] < 0) World::homeMatrix[i][j] = 0;
+            }
+                
+            if (World::foodMatrix[i][j]) {
+                tockice.setPixel(i, j, sf::Color::Black);
+                World::foodMatrix[i][j] -= 0.00075f;
+                if (World::foodMatrix[i][j] < 0) World::foodMatrix[i][j] = 0;
+            }
+        }
+    }
+    sf::Texture texture;
+    texture.loadFromImage(tockice);
+    sf::Sprite sprite;
+    sprite.setTexture(texture, true);
+
+    //Then, in PlayState::render()
+    window.draw(sprite);
 }
 
 
 int main()
 {
+    int pojeli = 0;
     std::ios_base::sync_with_stdio(false);
     std::cin.tie(NULL);
     //init
@@ -30,15 +64,33 @@ int main()
 
     std::vector<Mrav> mravi;
     std::vector<Food> hrana;
+    std::deque<Marker> markeri;
 
-    int n = 84;
+    int n = 512;
     bool drawMarkers = true;
     //mravinjak
-    sf::Sprite sMravinjak;
-    sMravinjak.setTexture(*Config::tMarker);
-    sMravinjak.setScale(1.5f, 1.5f);
-    sMravinjak.setColor(Config::cMravinjak);
-    sMravinjak.setPosition(1280 / 2 - (*Config::tMarker).getSize().x / 2 * 1.5f, 720 / 2 - (*Config::tMarker).getSize().y / 2 * 1.5f);
+    sf::CircleShape sMravinjak(30.0f);
+    sMravinjak.setOrigin(30.0f, 30.0f);
+    sMravinjak.setFillColor(Config::cMravinjak);
+    sMravinjak.setPosition(1280/2, 720/2);
+    sf::Font font;
+
+    //Load and check the availability of the font file
+    if (!font.loadFromFile("C:\\WINDOWS\\FONTS\\ARIAL.TTF"))
+    {
+        std::cout << "can't load font" << std::endl;
+    }
+
+    //Declare a Text object
+    sf::Text text("FARO", font);
+
+    //Set character size
+    text.setCharacterSize(20);
+
+    //Set fill color
+    text.setFillColor(sf::Color::Black);
+    text.setPosition(1280/2, 720/2);
+    
 
     for (int i = 0; i < n; ++i) {
         mravi.emplace_back(i);
@@ -60,7 +112,7 @@ int main()
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Right){
                     sf::Vector2f mousePosition((float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y);
-                    //std::cout << mousePosition.x << "  " << mousePosition.y << std::endl;
+                    std::cout << mousePosition.x << " clic " << mousePosition.y << std::endl;
                     hrana.emplace_back(mousePosition);
                 }
                 break;
@@ -72,17 +124,23 @@ int main()
         
         //moving
         for (int i = 0; i < n; ++i) {
-            mravi[i].move(dt, window, hrana, mravi, drawMarkers);
+            mravi[i].move(dt, window, hrana, mravi, drawMarkers, markeri, pojeli);
         }
 
         auto it = std::remove_if(hrana.begin(), hrana.end(), [](const auto& x) {return x.isGone(); });
         if (it != hrana.end()) hrana.erase(it);
 
+        drawMarkersFunc(window);
         draw(hrana, window);
         draw(mravi, window);
         
         //display
         window.draw(sMravinjak);
+        std::stringstream ss;
+        ss << pojeli;
+        text.setString(ss.str());
+        ss.clear();
+        window.draw(text);
         window.display();
     }
 

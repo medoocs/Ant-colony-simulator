@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 class Food {
 	public:
+		sf::CircleShape circle;
 		sf::Vector2f position;
 		sf::Texture tFood;
 		sf::Sprite sFood;
@@ -12,5 +13,5 @@ class Food {
 		void eat();
 		bool isGone() const;
 		int32_t getAmount();
-		sf::Sprite getSprite();
+		sf::CircleShape getSprite();
 };
