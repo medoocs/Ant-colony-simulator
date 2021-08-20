@@ -48,6 +48,30 @@ void drawMarkersFunc(sf::RenderWindow& window) {
     window.draw(sprite);
 }
 
+void setMravinjak(sf::CircleShape &sMravinjak, sf::Font &font, sf::Text &text) {
+    //mravinjak
+    sMravinjak.setRadius(Config::rad_mravinjak);
+    sMravinjak.setOrigin(Config::rad_mravinjak, Config::rad_mravinjak);
+    sMravinjak.setFillColor(Config::cMravinjak);
+    sMravinjak.setPosition(Config::width / 2, Config::height / 2);
+    // text na mravinjaku sa brojem hrane
+    if (!font.loadFromFile("res/arial.ttf"))
+        std::cout << "can't load font" << std::endl;
+    text.setCharacterSize(20);
+    sf::FloatRect textRect = text.getLocalBounds();
+    text.setFillColor(sf::Color::Black);
+    text.setStyle(sf::Text::Bold);
+    text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
+    text.setPosition(Config::width / 2, Config::height / 2);
+    // feromoni u mravinjaku
+    for (int i = (int)Config::width / 2 - Config::rad_mravinjak; i <= (int)Config::width / 2 + Config::rad_mravinjak; ++i) {
+        for (int j = (int)Config::height / 2 - Config::rad_mravinjak; j <= (int)Config::height / 2 + Config::rad_mravinjak; ++j) {
+            if ((((int)Config::width / 2 - i) * ((int)Config::width / 2 - i) + ((int)Config::height / 2 - j) * ((int)Config::height / 2 - j)) <= Config::rad_mravinjak * Config::rad_mravinjak) {
+                World::homeMatrix[i][j] = 100000;
+            }
+        }
+    }
+}
 
 int main()
 {
@@ -66,22 +90,11 @@ int main()
     std::vector<Food> hrana;
     // broj mrava
     int n = Config::nMrav;
-    //mravinjak
-    sf::CircleShape sMravinjak(Config::rad_mravinjak);
-    sMravinjak.setOrigin(Config::rad_mravinjak, Config::rad_mravinjak);
-    sMravinjak.setFillColor(Config::cMravinjak);
-    sMravinjak.setPosition(Config::width /2, Config::height /2);
-    // text na mravinjaku sa brojem hrane
+    // mravinjak
+    sf::CircleShape sMravinjak;
     sf::Font font;
-    if (!font.loadFromFile("C:\\WINDOWS\\FONTS\\ARIAL.TTF"))
-        std::cout << "can't load font" << std::endl;
     sf::Text text("FARO", font);
-    text.setCharacterSize(20);
-    sf::FloatRect textRect = text.getLocalBounds();
-    text.setFillColor(sf::Color::Black);
-    text.setStyle(sf::Text::Bold);
-    text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
-    text.setPosition(Config::width/2, Config::height/2);
+    setMravinjak(sMravinjak, font, text);
     // spremanje objekata mrava u vektor
     for (int i = 0; i < n; ++i) {
         mravi.emplace_back(i);
@@ -91,7 +104,7 @@ int main()
     while (window.isOpen()) {
         sf::Time dt = deltaClock.restart();
         sf::Event event;
-        World::homeMatrix[(int)Config::width / 2][(int)Config::height / 2] = 10000;
+        
         while (window.pollEvent(event)) {
             switch (event.type) {
             case sf::Event::Closed:

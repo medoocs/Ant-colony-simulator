@@ -9,8 +9,10 @@ class Food {
 		int32_t amount;
 	public:
 		// konstruktor za sprite i varijable
-		Food(sf::Vector2f pos);
+		Food(sf::Vector2f &pos);
 		~Food() = default;
+		// postavljanje feromona za food
+		void setFood(sf::Vector2f &pos);
 		// oduzmi amount
 		void eat();
 		// provjeri jel food prazan

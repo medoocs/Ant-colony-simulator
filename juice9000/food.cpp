@@ -5,15 +5,25 @@
 #include "config.h"
 #include "world.h"
 
-Food::Food(sf::Vector2f pos) {
+Food::Food(sf::Vector2f &pos) {
 	position = pos;
     amount = Config::amount;
     circle.setRadius(Config::rad_food);
     circle.setOrigin(Config::rad_food, Config::rad_food);
     circle.setFillColor(Config::cFood);
     circle.setPosition(pos);
-    World::foodMatrix[(int)pos.x][(int)pos.y] = 10000;
+    setFood(pos);
 
+}
+
+void Food::setFood(sf::Vector2f &pos) {
+    for (int i = (int)pos.x - Config::rad_food; i <= (int)pos.x + Config::rad_food; ++i) {
+        for (int j = (int)pos.y - Config::rad_food; j <= (int)pos.y + Config::rad_food; ++j) {
+            if ((((int)pos.x - i) * ((int)pos.x - i) + ((int)pos.y - j) * ((int)pos.y - j)) <= Config::rad_food * Config::rad_food) {
+                World::foodMatrix[i][j] = 100000;
+            }
+        }
+    }
 }
 
 void Food::eat() {
