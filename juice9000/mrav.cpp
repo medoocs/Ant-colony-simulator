@@ -2,44 +2,45 @@
 #include "utils.h"
 #include <iostream>
 #include <vector>
-#include "config.hpp"
-#include <deque>
+#include "config.h"
 #include "world.h"
+#define M_PI  3.141592653f
+#define rad2deg (360 / (M_PI * 2))
 
 Mrav::Mrav(uint32_t idM) {
     id = idM;
     sMrav.setTexture(*Config::tAnt);
-    sMrav.setOrigin((*Config::tAnt).getSize().x / 2, (*Config::tAnt).getSize().y / 2);
+    sMrav.setOrigin((*Config::tAnt).getSize().x / 2.f, (*Config::tAnt).getSize().y / 2.f);
     sMrav.setScale(0.1f, 0.1f);
     sMrav.setColor(Config::cAnt);
     sMrav.setPosition(Config::width / 2 - (*Config::tAnt).getSize().x / 2 * 0.1f, Config::height / 2 - (*Config::tAnt).getSize().y / 2 * 0.1f);
 }
 
-void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, bool drawMarkers, std::deque<Marker>& markeri, int& pojeli) {
+void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, int& pojeli) {
 
     float maxSpeed = Config::maxSpeed;
     float steerStrength = Config::steerStrength;
     float wanderStrength = Config::wanderStrength;
-
+    // za prvi frame
     if (flag) {
         position = sMrav.getPosition();
-        angles.push_back(sMrav.getRotation());
         flag = false;
     }
 
-
+    // biranje smjera kretnje ovisno o feromonima
     int dir = 1;
     if (!foundFood)
-        dir = World::chooseFoodDirection(position, sMrav.getRotation() - 90.f, window);
+        dir = World::chooseDirection(position, sMrav.getRotation() - 90.f, window, foundFood);
     else
-        dir = World::chooseHomeDirection(position, sMrav.getRotation() - 90.f, window);
+        dir = World::chooseDirection(position, sMrav.getRotation() - 90.f, window, foundFood);
+    // kretanje Config::deg_mrav u lijevo/desno
     if (dir == 0) {
-        float angle2 = (sMrav.getRotation() - 90.f - 20.f) / rad2deg;
+        float angle2 = (sMrav.getRotation() - 90.f - Config::deg_mrav) / rad2deg;
         desiredDirection.x = cos(angle2);
         desiredDirection.y = sin(angle2);
     }
     else if (dir == 2) {
-        float angle2 = (sMrav.getRotation() - 90.f + 20.f) / rad2deg;
+        float angle2 = (sMrav.getRotation() - 90.f + Config::deg_mrav) / rad2deg;
         desiredDirection.x = cos(angle2);
         desiredDirection.y = sin(angle2);
     }
@@ -60,9 +61,9 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
     if (Utils::delta(position.x, (float)Config::width)) {
         desiredDirection.x = -maxSpeed;
     }
-
-    
-
+    // racunanje positiona i angle mrava
+    // nakon odredivanja desired directiona zbraja se randdom tocka iz kruznice kako bi postojao nekakav RNG 
+    // u kretnji mrava uz nekakvu varijablu koja odreduje jacinu odluke da mrav skrene
     desiredDirection = Utils::normalize(desiredDirection + Utils::randPoint(1.0, 0.0, 0.0) * wanderStrength);
     
     sf::Vector2f desiredVelocity = desiredDirection * maxSpeed;
@@ -71,38 +72,37 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
     velocity = Utils::ClampMagnitude(velocity + acceleration * dt.asSeconds(), maxSpeed);
     position += velocity * dt.asSeconds();
     float angle = (float)atan2(velocity.y, velocity.x) * (float)rad2deg;
-    //std::cout << angle <<"\n";
     sMrav.setPosition(position);
     sMrav.setRotation(angle + 90);
-
-    
-
+    // provjera kolizija
     checkFood(hrana);
     checkHome(pojeli);
-
+    // increment feromona
     if (!foundFood)
         World::incHome(sf::Vector2i(position));
     else
         World::incFood(sf::Vector2i(position));
 }
-
+// vraca sprite mrava
 sf::Sprite Mrav::getSprite() {
     return sMrav;
 }
-
+// provjerava koliziju mrava i hrane za svaki frame
 void Mrav::checkFood(std::vector<Food>& hrana) {
     for (auto& h : hrana) {
-        if (Utils::delta(sMrav.getPosition().x, h.getSprite().getPosition().x, 10.f) && Utils::delta(sMrav.getPosition().y, h.getSprite().getPosition().y, 10.f)) {
+        if (((sMrav.getPosition().x - h.getSprite().getPosition().x) * (sMrav.getPosition().x - h.getSprite().getPosition().x) + (sMrav.getPosition().y - h.getSprite().getPosition().y) * (sMrav.getPosition().y - h.getSprite().getPosition().y)) <= Config::rad_food * Config::rad_food){
             if (!foundFood) {
                 if (!h.isGone()) {
+                    // desila se kolizija, jedi hranu
                     h.eat();
                     foundFood = true;
-                    prviFood = true;
                 }else {
-                    int x = (int)h.getSprite().getPosition().x;
-                    int y = (int)h.getSprite().getPosition().y;
-                    for (int i = x - 10; i <= x + 10; ++i) {
-                        for (int j = y - 10; j <= y - 10; ++j) {
+                    // ciscenje feromona sa mjesta gdje se nalazila hrana
+                    sf::CircleShape tmp = h.getSprite();
+                    int x = (int)tmp.getPosition().x;
+                    int y = (int)tmp.getPosition().y;
+                    for (int i = x - (int)Config::rad_food; i <= x + (int)Config::rad_food; ++i) {
+                        for (int j = y - (int)Config::rad_food; j <= y - (int)Config::rad_food; ++j) {
                             World::foodMatrix[i][j] = 0;
                         }
                     }
@@ -111,18 +111,14 @@ void Mrav::checkFood(std::vector<Food>& hrana) {
         }
     }
 }
-
+// kolizija mrava i mravinjaka
 void Mrav::checkHome(int& pojeli) {
-    if (Utils::delta(sMrav.getPosition().x, Config::width / 2, 30.f) && Utils::delta(sMrav.getPosition().y, Config::height / 2, 30.f)) {
+    if (((sMrav.getPosition().x - Config::width / 2) * (sMrav.getPosition().x - Config::width / 2) + (sMrav.getPosition().y - Config::height / 2) * (sMrav.getPosition().y - Config::height / 2)) <= Config::rad_mravinjak * Config::rad_mravinjak){
         if (foundFood) {
+            // desila se kolizija deposit hranu
             ++pojeli;
-            prviHome = true;
         }
             
         foundFood = false;
     }
-}
-
-std::vector<Marker>& Mrav::getMarkers() {
-    return path;
 }

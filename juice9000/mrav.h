@@ -2,31 +2,24 @@
 #include <SFML/Graphics.hpp>
 #include "food.h"
 #include <vector>
-#include "marker.h"
-#include <deque>
-#define rad2deg (360 / (M_PI * 2))
 
 class Mrav{
     private:
         uint32_t id;
         sf::Texture tMrav;
         sf::Vector2f position, velocity, desiredDirection;
-        std::vector<Marker> path;
-        std::vector<sf::Vector2f> fullPositions;
-        std::vector<float> angles;
-        bool flag = true, foundFood = false, foundHome = false, prviFood = false, prviHome = false;
-        int32_t steps = 0;
-
-
-	public:
+        bool flag = true, foundFood = false, foundHome = false;
         sf::Sprite sMrav;
+	public:
+        // konstruktor za napravit sprite i settat varijable 
         Mrav(uint32_t idM);
         ~Mrav() = default;
-        void move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, bool drawMarkers, std::deque<Marker> &markeri, int &pojeli);
+        // funkcija za micanje mrava
+        void move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, int &pojeli);
+        // vraca sprite
         sf::Sprite getSprite();
+        // kolizija sa food
         void checkFood(std::vector<Food>& hrana);
+        // kolizija za home
         void checkHome(int &pojeli);
-        void checkFero(std::vector<Mrav>& mravi);
-        std::vector<Marker> &getMarkers();
-
 };

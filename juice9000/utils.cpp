@@ -1,11 +1,13 @@
 #include "utils.h"
-
+#define M_PI  3.141592653f
+#define rad2deg (360 / (M_PI * 2))
+// epsilon funkcija
 bool Utils::delta(float x, float y, float epsilon) {
     if (fabs(x - y) < epsilon)
         return true;
     return false;
 }
-
+// sljedece 3 funkcije su funckije iz unity i njihove cpp implementacije
 float Utils::sqrMagnitudeFunc(sf::Vector2f vector) {
     return vector.x * vector.x + vector.y * vector.y;
 }
@@ -32,7 +34,7 @@ sf::Vector2f Utils::normalize(const sf::Vector2f& source) {
     else
         return source;
 }
-
+// random point iz kruznice
 sf::Vector2f Utils::randPoint(float rad, float xc, float yc) {
     float ang, hyp, adj, opp;
     ang = (float)rand() / RAND_MAX * 2 * M_PI;
