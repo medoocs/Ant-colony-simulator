@@ -14,7 +14,7 @@ class Mrav{
         std::vector<Marker> path;
         std::vector<sf::Vector2f> fullPositions;
         std::vector<float> angles;
-        bool flag = true, foundFood = false, foundHome = false;
+        bool flag = true, foundFood = false, foundHome = false, prviFood = false, prviHome = false;
         int32_t steps = 0;
 
 

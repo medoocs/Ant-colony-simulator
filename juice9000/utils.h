@@ -8,5 +8,5 @@ class Utils {
         static sf::Vector2f normalize(const sf::Vector2f & source);
         static sf::Vector2f ClampMagnitude(sf::Vector2f vector, float maxLength);
         static float sqrMagnitudeFunc(sf::Vector2f vector);
-        static bool delta(float x, float y, float epsilon = 100.0f);
+        static bool delta(float x, float y, float epsilon = 10.0f);
 };

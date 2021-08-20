@@ -26,15 +26,15 @@ void drawMarkersFunc(sf::RenderWindow& window) {
     
     for (int i = 0; i < 1280; ++i) {
         for (int j = 0; j < 720; ++j) {
-            if (World::homeMatrix[i][j]) {
+            if (World::homeMatrix[i][j] > 0) {
                 tockice.setPixel(i, j, sf::Color(255,255,255,120));
-                World::homeMatrix[i][j] -= 0.00075f;
+                World::homeMatrix[i][j] -= 0.00015f;
                 if (World::homeMatrix[i][j] < 0) World::homeMatrix[i][j] = 0;
             }
                 
-            if (World::foodMatrix[i][j]) {
+            if (World::foodMatrix[i][j] > 0) {
                 tockice.setPixel(i, j, sf::Color::Black);
-                World::foodMatrix[i][j] -= 0.00075f;
+                World::foodMatrix[i][j] -= 0.0015f;
                 if (World::foodMatrix[i][j] < 0) World::foodMatrix[i][j] = 0;
             }
         }
@@ -44,7 +44,6 @@ void drawMarkersFunc(sf::RenderWindow& window) {
     sf::Sprite sprite;
     sprite.setTexture(texture, true);
 
-    //Then, in PlayState::render()
     window.draw(sprite);
 }
 
@@ -66,29 +65,27 @@ int main()
     std::vector<Food> hrana;
     std::deque<Marker> markeri;
 
-    int n = 512;
+    int n = 1024;
     bool drawMarkers = true;
     //mravinjak
     sf::CircleShape sMravinjak(30.0f);
     sMravinjak.setOrigin(30.0f, 30.0f);
     sMravinjak.setFillColor(Config::cMravinjak);
     sMravinjak.setPosition(1280/2, 720/2);
-    sf::Font font;
 
-    //Load and check the availability of the font file
+    sf::Font font;
     if (!font.loadFromFile("C:\\WINDOWS\\FONTS\\ARIAL.TTF"))
     {
         std::cout << "can't load font" << std::endl;
     }
 
-    //Declare a Text object
+    
     sf::Text text("FARO", font);
-
-    //Set character size
     text.setCharacterSize(20);
-
-    //Set fill color
+    sf::FloatRect textRect = text.getLocalBounds();
     text.setFillColor(sf::Color::Black);
+    text.setStyle(sf::Text::Bold);
+    text.setOrigin(textRect.left + textRect.width / 2.0f, textRect.top + textRect.height / 2.0f);
     text.setPosition(1280/2, 720/2);
     
 
@@ -101,6 +98,8 @@ int main()
     while (window.isOpen()) {
         sf::Time dt = deltaClock.restart();
         sf::Event event;
+        World::foodMatrix[(int)1280 / 2][(int)720 / 2] = 10000;
+        World::homeMatrix[(int)1280 / 2][(int)720 / 2] = 10000;
         while (window.pollEvent(event)) {
             switch (event.type) {
             case sf::Event::Closed:
@@ -112,7 +111,7 @@ int main()
             case sf::Event::MouseButtonPressed:
                 if (event.mouseButton.button == sf::Mouse::Right){
                     sf::Vector2f mousePosition((float)sf::Mouse::getPosition(window).x, (float)sf::Mouse::getPosition(window).y);
-                    std::cout << mousePosition.x << " clic " << mousePosition.y << std::endl;
+                    //std::cout << mousePosition.x << " clic " << mousePosition.y << std::endl;
                     hrana.emplace_back(mousePosition);
                 }
                 break;

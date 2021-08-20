@@ -12,14 +12,14 @@ Mrav::Mrav(uint32_t idM) {
     sMrav.setOrigin((*Config::tAnt).getSize().x / 2, (*Config::tAnt).getSize().y / 2);
     sMrav.setScale(0.1f, 0.1f);
     sMrav.setColor(Config::cAnt);
-    sMrav.setPosition(1280 / 2 - (*Config::tAnt).getSize().x / 2 * 0.1f, 720 / 2 - (*Config::tAnt).getSize().y / 2 * 0.1f);
+    sMrav.setPosition(Config::width / 2 - (*Config::tAnt).getSize().x / 2 * 0.1f, Config::height / 2 - (*Config::tAnt).getSize().y / 2 * 0.1f);
 }
 
-void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, bool drawMarkers, std::deque<Marker> &markeri, int &pojeli) {
-    
-    float maxSpeed = 200;
-    float steerStrength = 50;
-    float wanderStrength = 0.5;
+void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana, std::vector<Mrav>& mravi, bool drawMarkers, std::deque<Marker>& markeri, int& pojeli) {
+
+    float maxSpeed = Config::maxSpeed;
+    float steerStrength = Config::steerStrength;
+    float wanderStrength = Config::wanderStrength;
 
     if (flag) {
         position = sMrav.getPosition();
@@ -27,19 +27,19 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
         flag = false;
     }
 
-    
+
     int dir = 1;
-    if(!foundFood)
+    if (!foundFood)
         dir = World::chooseFoodDirection(position, sMrav.getRotation() - 90.f, window);
     else
         dir = World::chooseHomeDirection(position, sMrav.getRotation() - 90.f, window);
     if (dir == 0) {
-        float angle2 = (sMrav.getRotation() -90.f - 15.f)/rad2deg;
+        float angle2 = (sMrav.getRotation() - 90.f - 20.f) / rad2deg;
         desiredDirection.x = cos(angle2);
         desiredDirection.y = sin(angle2);
     }
     else if (dir == 2) {
-        float angle2 = (sMrav.getRotation() -90.f + 15.f) / rad2deg;
+        float angle2 = (sMrav.getRotation() - 90.f + 20.f) / rad2deg;
         desiredDirection.x = cos(angle2);
         desiredDirection.y = sin(angle2);
     }
@@ -49,7 +49,7 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
         desiredDirection.y = maxSpeed;
     }
     //odbijanje dole
-    if (Utils::delta(position.y, 720.f)) {
+    if (Utils::delta(position.y, (float)Config::height)) {
         desiredDirection.y = -maxSpeed;
     }
     //odbijanje lijevo
@@ -57,12 +57,14 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
         desiredDirection.x = maxSpeed;
     }
     //odbijanje desno
-    if (Utils::delta(position.x, 1280.f)) {
+    if (Utils::delta(position.x, (float)Config::width)) {
         desiredDirection.x = -maxSpeed;
     }
 
-    //desiredDirection = Utils::normalize(desiredDirection + Utils::randPoint(1.0, 0.0, 0.0) * wanderStrength);
+    
 
+    desiredDirection = Utils::normalize(desiredDirection + Utils::randPoint(1.0, 0.0, 0.0) * wanderStrength);
+    
     sf::Vector2f desiredVelocity = desiredDirection * maxSpeed;
     sf::Vector2f desiredSteeringForce = (desiredVelocity - velocity) * steerStrength;
     sf::Vector2f acceleration = Utils::ClampMagnitude(desiredSteeringForce, steerStrength);
@@ -73,15 +75,12 @@ void Mrav::move(sf::Time dt, sf::RenderWindow& window, std::vector<Food>& hrana,
     sMrav.setPosition(position);
     sMrav.setRotation(angle + 90);
 
-    if (steps % 1000 == 0) {
-        markeri.emplace_back(position);
-        if (markeri.size() > 5) markeri.pop_front();
-    }
+    
 
     checkFood(hrana);
     checkHome(pojeli);
 
-    if(!foundFood)
+    if (!foundFood)
         World::incHome(sf::Vector2i(position));
     else
         World::incFood(sf::Vector2i(position));
@@ -93,19 +92,33 @@ sf::Sprite Mrav::getSprite() {
 
 void Mrav::checkFood(std::vector<Food>& hrana) {
     for (auto& h : hrana) {
-        if ( Utils::delta(sMrav.getPosition().x, h.getSprite().getPosition().x, 10.f) && Utils::delta(sMrav.getPosition().y, h.getSprite().getPosition().y, 10.f) ) {
+        if (Utils::delta(sMrav.getPosition().x, h.getSprite().getPosition().x, 10.f) && Utils::delta(sMrav.getPosition().y, h.getSprite().getPosition().y, 10.f)) {
             if (!foundFood) {
-                h.eat();
-                foundFood = true;
+                if (!h.isGone()) {
+                    h.eat();
+                    foundFood = true;
+                    prviFood = true;
+                }else {
+                    int x = (int)h.getSprite().getPosition().x;
+                    int y = (int)h.getSprite().getPosition().y;
+                    for (int i = x - 10; i <= x + 10; ++i) {
+                        for (int j = y - 10; j <= y - 10; ++j) {
+                            World::foodMatrix[i][j] = 0;
+                        }
+                    }
+                }
             }
         }
     }
 }
 
-void Mrav::checkHome(int &pojeli) {
-    if (Utils::delta(sMrav.getPosition().x, 1280/2, 15.f) && Utils::delta(sMrav.getPosition().y, 720/2, 15.f)) {
-        if (foundFood)
+void Mrav::checkHome(int& pojeli) {
+    if (Utils::delta(sMrav.getPosition().x, Config::width / 2, 30.f) && Utils::delta(sMrav.getPosition().y, Config::height / 2, 30.f)) {
+        if (foundFood) {
             ++pojeli;
+            prviHome = true;
+        }
+            
         foundFood = false;
     }
 }
@@ -113,4 +126,3 @@ void Mrav::checkHome(int &pojeli) {
 std::vector<Marker>& Mrav::getMarkers() {
     return path;
 }
-

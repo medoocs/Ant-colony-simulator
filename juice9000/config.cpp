@@ -9,6 +9,12 @@ sf::Color Config::cMravinjak = sf::Color(181, 101, 29);
 uint32_t Config::width = 1280;
 uint32_t Config::height = 720;
 
+float Config::rad_mrav = 25.f;
+float Config::maxSpeed = 50;
+float Config::steerStrength = 50;
+float Config::wanderStrength = 0.5;
+int Config::amount = 1000;
+
 std::shared_ptr<sf::Texture> Config::tAnt;
 std::shared_ptr<sf::Texture> Config::tMarker;
 std::shared_ptr<sf::Texture> Config::tFood;
